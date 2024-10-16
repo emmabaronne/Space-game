@@ -1,15 +1,17 @@
-// This is the basic configuration for the game
+let astronaut;
+let isDragging = false;  // To track if the user is holding the screen
+
 const config = {
-    type: Phaser.AUTO,  // Phaser will decide the best rendering method (WebGL or Canvas)
+    type: Phaser.AUTO,
     scale: {
         mode: Phaser.Scale.FIT,  // Scales the game to fit the screen
         autoCenter: Phaser.Scale.CENTER_BOTH,  // Centers the game on the screen
-        width: window.innerWidth,  // Uses the width of the user's screen
-        height: window.innerHeight  // Uses the height of the user's screen
+        width: window.innerWidth,  // Uses the full screen width
+        height: window.innerHeight  // Uses the full screen height
     },
     backgroundColor: '#000000',  // Background color (black for space)
-    parent: 'game-container',  // The HTML element where the game will be rendered
-    scene: {            // The 3 main phases: preload, create, and update
+    parent: 'game-container',
+    scene: {
         preload: preload,
         create: create,
         update: update
@@ -21,49 +23,50 @@ const game = new Phaser.Game(config);
 
 // Preload assets
 function preload() {
-    // Example for loading images. Replace 'astronaut.png', 'asteroid.png', and 'product.png' with your actual file names.
     this.load.image('astronaut', 'assets/astronaut.png');
-    this.load.image('asteroid', 'assets/asteroid.png');
-    this.load.image('product', 'assets/product.png');
 }
 
 // Create game objects
 function create() {
-    this.astronaut = this.add.sprite(this.scale.width / 2, this.scale.height - 100, 'astronaut');  // Adjust astronaut position for different screen sizes
-// Full-screen button
-const fullscreenButton = this.add.text(10, 10, 'Full Screen', { font: '16px Arial', fill: '#ffffff' })
-    .setInteractive()  // Makes the text clickable
-    .on('pointerdown', () => {  // On click, toggle fullscreen mode
-        if (this.scale.isFullscreen) {
-            this.scale.stopFullscreen();  // Exit fullscreen if already in fullscreen mode
-        } else {
-            this.scale.startFullscreen();  // Enter fullscreen mode
-        }
-    });
+    // Add astronaut sprite at the bottom of the screen
+    astronaut = this.add.sprite(this.scale.width / 2, this.scale.height - 100, 'astronaut').setInteractive();
 
-    const hammer = new Hammer(document.body);  // Detect gestures on the whole body
-    hammer.get('swipe').set({ 
-        direction: Hammer.DIRECTION_HORIZONTAL, 
-        threshold: 10,  // Lower the threshold for better mobile sensitivity
-        velocity: 0.3   // Adjust swipe velocity for mobile responsiveness
-    });
+    // Add event listeners for pointer (touch/mouse) interactions
+    this.input.on('pointerdown', startDragging);
+    this.input.on('pointermove', moveAstronaut);
+    this.input.on('pointerup', stopDragging);
 
-    // Move astronaut left on swipe left
-    hammer.on('swipeleft', () => {
-        if (this.astronaut.x > 50) {
-            this.astronaut.x -= 50;
-        }
-    });
-
-    // Move astronaut right on swipe right
-    hammer.on('swiperight', () => {
-        if (this.astronaut.x < this.scale.width - 50) {
-            this.astronaut.x += 50;
-        }
-    });
+    // Full-screen button
+    const fullscreenButton = this.add.text(10, 10, 'Full Screen', { font: '16px Arial', fill: '#ffffff' })
+        .setInteractive()
+        .on('pointerdown', () => {
+            if (this.scale.isFullscreen) {
+                this.scale.stopFullscreen();
+            } else {
+                this.scale.startFullscreen();
+            }
+        });
 }
 
-// Game update loop (runs every frame)
+// Track when the user is pressing down
+function startDragging(pointer) {
+    isDragging = true;
+}
+
+// Move the astronaut as the user drags their finger (or moves the mouse)
+function moveAstronaut(pointer) {
+    if (isDragging) {
+        // Move the astronaut based on the pointer's X position
+        astronaut.x = Phaser.Math.Clamp(pointer.x, 50, config.scale.width - 50);  // Clamp to keep astronaut on the screen
+    }
+}
+
+// Stop dragging when the user lifts their finger (or stops clicking)
+function stopDragging() {
+    isDragging = false;
+}
+
+// Update function (not used right now)
 function update() {
-    // We'll add asteroid movement and collision detection here later
+    // No update logic needed for continuous movement
 }
