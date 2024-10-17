@@ -52,8 +52,8 @@ function create() {
 
     // Set scale factors for mobile and desktop
     let astronautScaleFactor = this.scale.width < 600 ? 0.16 : 0.25;
-    let asteroidScaleFactor = this.scale.width < 600 ? 0.70 : 0.60;  // Set asteroid scale
-    let productScaleFactor = this.scale.width < 600 ? 0.70 : 0.60;   // Set brand product scale
+    let asteroidScaleFactor = this.scale.width < 600 ? 0.10 : 0.08;  // Adjusted asteroid scale
+    let productScaleFactor = this.scale.width < 600 ? 0.10 : 0.08;   // Adjusted brand product scale
 
     // Add astronaut with physics
     astronaut = this.physics.add.sprite(this.scale.width / 2, this.scale.height - 100, 'astronaut').setInteractive();
@@ -117,7 +117,7 @@ function spawnAsteroid(scaleFactor) {
         let asteroidX = Phaser.Math.Between(50, config.scale.width - 50);
         let asteroid = enemies.create(asteroidX, 0, 'asteroid');
         asteroid.setVelocityY(100);  // Adjust speed for asteroids
-        asteroid.setScale(scaleFactor);  // Apply scale factor (0.60 for desktop, 0.70 for mobile)
+        asteroid.setScale(scaleFactor);  // Apply scale factor (0.08 for desktop, 0.10 for mobile)
     }
 }
 
@@ -127,7 +127,7 @@ function spawnToken(scaleFactor) {
         let tokenX = Phaser.Math.Between(50, config.scale.width - 50);
         let token = tokens.create(tokenX, 0, 'token');
         token.setVelocityY(80);  // Token moves slower than asteroids
-        token.setScale(scaleFactor);  // Apply scale factor (0.60 for desktop, 0.70 for mobile)
+        token.setScale(scaleFactor);  // Apply scale factor (0.08 for desktop, 0.10 for mobile)
     }
 }
 
