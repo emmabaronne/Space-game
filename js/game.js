@@ -47,13 +47,10 @@ function preload() {
 
 // Create game objects and input handlers
 function create() {
-    // Add background image
-    const background = this.add.image(0, 0, 'background').setOrigin(0.5, 0.5);  // Center the background
-    background.setDisplaySize(this.scale.width, window.innerHeight);  // Set height to 100% VH, width adjusts to maintain aspect ratio
-    background.setPosition(this.scale.width / 2, this.scale.height / 2);  // Ensure it remains centered
+    // Remove any existing background handling here, as CSS now takes care of it.
 
-    // Rest of the game setup remains the same...
-
+    // The rest of the game setup remains the same...
+    
     let astronautScaleFactor = this.scale.width < 600 ? 0.16 : 0.25;
     let asteroidScaleFactor = this.scale.width < 600 ? 0.06 : 0.08;
     let productScaleFactor = this.scale.width < 600 ? 0.06 : 0.08;
@@ -75,6 +72,9 @@ function create() {
         repeat: -1,
         ease: 'Sine.easeInOut'
     });
+
+    // Set up enemies and tokens, score tracking, and mobile interactions...
+
 
 
     // Create enemies group (asteroids)
