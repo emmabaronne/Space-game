@@ -3,8 +3,10 @@ let cursors;
 let enemies;
 let tokens;  // Tokens to be collected
 let score = 0;
+let highScore = localStorage.getItem('highScore') || 0;  // Retrieve stored high score or default to 0
 let gameOver = false;
 let scoreText;
+let highScoreText;
 let gameStarted = false;
 let startButton;
 
@@ -84,6 +86,9 @@ function create() {
     // Initialize score text
     scoreText = this.add.text(10, 10, 'Score: 0', { font: '16px Arial', fill: '#ffffff' });
 
+    // Initialize high score text
+    highScoreText = this.add.text(10, 30, `High Score: ${highScore}`, { font: '16px Arial', fill: '#ffffff' });
+
     // Initialize keyboard input
     cursors = this.input.keyboard.createCursorKeys();
     this.input.keyboard.addKeys({ 'A': Phaser.Input.Keyboard.KeyCodes.A, 'D': Phaser.Input.Keyboard.KeyCodes.D });
@@ -142,16 +147,28 @@ function collectToken(astronaut, token) {
 function handleCollision() {
     gameOver = true;
     this.physics.pause();  // Stop the game physics
+
+    // Update high score if current score is higher
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('highScore', highScore);  // Store new high score in localStorage
+    }
+
     astronaut.setTint(0xff0000);  // Turn astronaut red to indicate hit
     showGameOverScreen(this);  // Show the game-over screen
 }
 
-// Show the Game Over screen and Reset button
+// Show the Game Over screen and display high score
 function showGameOverScreen(scene) {
     const gameOverText = scene.add.text(scene.scale.width / 2, scene.scale.height / 2, 'Game Over', { font: '32px Arial', fill: '#ff0000' });
     gameOverText.setOrigin(0.5);
 
-    const resetButton = scene.add.text(scene.scale.width / 2, scene.scale.height / 2 + 50, 'Reset', { font: '24px Arial', fill: '#ffffff' });
+    // Display current high score
+    const highScoreText = scene.add.text(scene.scale.width / 2, scene.scale.height / 2 + 50, `High Score: ${highScore}`, { font: '24px Arial', fill: '#ffffff' });
+    highScoreText.setOrigin(0.5);
+
+    // Add reset button
+    const resetButton = scene.add.text(scene.scale.width / 2, scene.scale.height / 2 + 100, 'Reset', { font: '24px Arial', fill: '#ffffff' });
     resetButton.setOrigin(0.5);
     resetButton.setInteractive().on('pointerdown', () => resetGame(scene));
 }
