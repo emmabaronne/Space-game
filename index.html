@@ -4,18 +4,37 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <title>Space Astronaut Game</title>
+        
+        <!-- Link to your CSS file -->
         <link rel="stylesheet" href="css/styles.css">
+
+        <!-- Inline styles to ensure the game container fills the screen -->
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+
+            #game-container {
+                width: 100%;
+                height: 100vh;  /* Make sure the container takes the full height of the viewport */
+                overflow: hidden;
+                position: relative;  /* Ensures elements like text can be placed within the container */
+            }
+        </style>
     </head>      
-<body>
-    <div id="game-container"></div> <!-- This is where our game will appear -->
-    
-    <!-- Phaser.js library -->
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <body>
+        <!-- This is where our game will appear -->
+        <div id="game-container"></div> 
 
-    <!-- Hammer.js for swipe gestures -->
-    <script src="https://hammerjs.github.io/dist/hammer.min.js"></script>
+        <!-- Phaser.js library -->
+        <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
 
-    <!-- Your game logic -->
-    <script src="js/game.js"></script>
-</body>
+        <!-- Hammer.js for swipe gestures -->
+        <script src="https://hammerjs.github.io/dist/hammer.min.js"></script>
+
+        <!-- Your game logic -->
+        <script src="js/game.js"></script>
+    </body>
 </html>
