@@ -30,11 +30,15 @@ function preload() {
 
 // Create game objects and input handlers
 function create() {
-    // Add static background image to the game, making sure it covers the entire screen
-    const background = this.add.image(0, 0, 'background').setOrigin(0, 0).setDisplaySize(this.scale.width, this.scale.height);
-    
-    // Add astronaut sprite at the bottom of the screen
+    // Add background image and ensure it covers the entire screen responsively
+    const background = this.add.image(0, 0, 'background').setOrigin(0, 0);
+    background.displayWidth = this.scale.width;  // Fit background to the screen width
+    background.displayHeight = this.scale.height;  // Fit background to the screen height
+
+    // Set a dynamic scale for the astronaut based on screen width to fit mobile screens
+    const astronautScaleFactor = this.scale.width / 800;  // Adjust 800 to fit your design
     astronaut = this.add.sprite(this.scale.width / 2, this.scale.height - 100, 'astronaut').setInteractive();
+    astronaut.setScale(astronautScaleFactor);  // Scale dynamically based on screen size
 
     // Add event listeners for pointer (touch/mouse) interactions
     this.input.on('pointerdown', startDragging);
