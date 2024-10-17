@@ -47,10 +47,8 @@ function preload() {
 
 // Create game objects and input handlers
 function create() {
-    // Remove any existing background handling here, as CSS now takes care of it.
+    // Background is now handled through CSS, so no background setup here in JS.
 
-    // The rest of the game setup remains the same...
-    
     let astronautScaleFactor = this.scale.width < 600 ? 0.16 : 0.25;
     let asteroidScaleFactor = this.scale.width < 600 ? 0.06 : 0.08;
     let productScaleFactor = this.scale.width < 600 ? 0.06 : 0.08;
@@ -72,10 +70,6 @@ function create() {
         repeat: -1,
         ease: 'Sine.easeInOut'
     });
-
-    // Set up enemies and tokens, score tracking, and mobile interactions...
-
-
 
     // Create enemies group (asteroids)
     enemies = this.physics.add.group();
