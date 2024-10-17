@@ -39,7 +39,7 @@ function create() {
     let astronautScaleFactor;
     if (this.scale.width < 600) {
         // Mobile screen (width less than 600px)
-        astronautScaleFactor = (this.scale.width / 1200) * 0.01;  // 10x smaller for mobile
+        astronautScaleFactor = (this.scale.width / 1200) * 0.025;  // 6x smaller for mobile
     } else {
         // Desktop screen (width 600px or more)
         astronautScaleFactor = this.scale.width / 1800;  // Keep the current scale for desktop
