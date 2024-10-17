@@ -25,10 +25,14 @@ const game = new Phaser.Game(config);
 // Preload assets
 function preload() {
     this.load.image('astronaut', 'assets/astronaut.png');
+    this.load.image('background', 'assets/background.png');  // Preload the background image
 }
 
 // Create game objects and input handlers
 function create() {
+    // Add static background image to the game
+    this.add.image(0, 0, 'background').setOrigin(0, 0).setDisplaySize(config.width, config.height);
+
     // Add astronaut sprite at the bottom of the screen
     astronaut = this.add.sprite(this.scale.width / 2, this.scale.height - 100, 'astronaut').setInteractive();
 
