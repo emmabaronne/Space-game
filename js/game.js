@@ -1,5 +1,6 @@
 let astronaut;
 let isDragging = false;  // To track if the user is holding the screen
+let cursors;  // To handle keyboard inputs
 
 const config = {
     type: Phaser.AUTO,
@@ -26,7 +27,7 @@ function preload() {
     this.load.image('astronaut', 'assets/astronaut.png');
 }
 
-// Create game objects
+// Create game objects and input handlers
 function create() {
     // Add astronaut sprite at the bottom of the screen
     astronaut = this.add.sprite(this.scale.width / 2, this.scale.height - 100, 'astronaut').setInteractive();
@@ -46,14 +47,18 @@ function create() {
                 this.scale.startFullscreen();
             }
         });
+
+    // Initialize keyboard input for arrow keys and "A" and "D" keys
+    cursors = this.input.keyboard.createCursorKeys();  // Arrow keys
+    this.input.keyboard.addKeys({ 'A': Phaser.Input.Keyboard.KeyCodes.A, 'D': Phaser.Input.Keyboard.KeyCodes.D });
 }
 
-// Track when the user is pressing down
+// Track when the user is pressing down (touch/mouse)
 function startDragging(pointer) {
     isDragging = true;
 }
 
-// Move the astronaut as the user drags their finger (or moves the mouse)
+// Move the astronaut as the user drags their finger (touch/mouse)
 function moveAstronaut(pointer) {
     if (isDragging) {
         // Move the astronaut based on the pointer's X position
@@ -61,12 +66,20 @@ function moveAstronaut(pointer) {
     }
 }
 
-// Stop dragging when the user lifts their finger (or stops clicking)
+// Stop dragging when the user lifts their finger (touch/mouse)
 function stopDragging() {
     isDragging = false;
 }
 
-// Update function (not used right now)
+// Update loop: handles keyboard inputs for desktop
 function update() {
-    // No update logic needed for continuous movement
+    // Move left with left arrow or "A"
+    if (cursors.left.isDown || this.input.keyboard.keys[65].isDown) {  // 65 is the keycode for "A"
+        astronaut.x = Phaser.Math.Clamp(astronaut.x - 5, 50, config.scale.width - 50);  // Move left, clamped to screen bounds
+    }
+    
+    // Move right with right arrow or "D"
+    if (cursors.right.isDown || this.input.keyboard.keys[68].isDown) {  // 68 is the keycode for "D"
+        astronaut.x = Phaser.Math.Clamp(astronaut.x + 5, 50, config.scale.width - 50);  // Move right, clamped to screen bounds
+    }
 }
