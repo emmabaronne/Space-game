@@ -1,6 +1,7 @@
 let astronaut;
 let cursors;
 let enemies;
+let tokens;  // Tokens to be collected
 let score = 0;
 let gameOver = false;
 let scoreText;
@@ -20,8 +21,8 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 50 },  // Apply low gravity for floating effect
-            debug: false  // Set true if you want to see the physics bounds for debugging
+            gravity: { y: 50 },  // Adjusted gravity for floating
+            debug: false
         }
     },
     scene: {
@@ -38,7 +39,8 @@ const game = new Phaser.Game(config);
 function preload() {
     this.load.image('astronaut', 'assets/astronaut.png');
     this.load.image('background', 'assets/background.png');
-    this.load.image('enemy', 'assets/enemy.png');  // Preload enemy image
+    this.load.image('asteroid', 'assets/asteroid.png');  // Preload asteroid (enemy)
+    this.load.image('token', 'assets/brand-product.png');  // Preload token (brand product)
 }
 
 // Create game objects and input handlers
@@ -51,16 +53,31 @@ function create() {
     // Set scale factors for mobile and desktop
     let astronautScaleFactor = this.scale.width < 600 ? 0.16 : 0.25;
 
-    // Add astronaut with physics and allow it to bounce
+    // Add astronaut with physics
     astronaut = this.physics.add.sprite(this.scale.width / 2, this.scale.height - 100, 'astronaut').setInteractive();
     astronaut.setScale(astronautScaleFactor);
-    astronaut.setBounce(0.3);  // Slight bounce effect
-    astronaut.setCollideWorldBounds(true);  // Keeps astronaut within bounds
-    astronaut.setDragX(600);  // Horizontal drag to make movement smoother
-    astronaut.body.allowGravity = true;  // Gravity will affect only the vertical axis
-
-    // Create enemies group
+    astronaut.setBounce(0.4);  // Increase bounce for more visible floating
+    astronaut.setCollideWorldBounds(true);  // Prevent astronaut from leaving bounds
+    astronaut.setDragX(500);  // Smooth drag for left-right movement
+    astronaut.body.allowGravity = true;  // Floating effect
+    
+    // Create enemies group (asteroids)
     enemies = this.physics.add.group();
+    this.time.addEvent({
+        delay: 1500,
+        callback: spawnAsteroid,
+        callbackScope: this,
+        loop: true
+    });
+
+    // Create tokens group (brand products)
+    tokens = this.physics.add.group();
+    this.time.addEvent({
+        delay: 2000,
+        callback: spawnToken,
+        callbackScope: this,
+        loop: true
+    });
 
     // Initialize score text
     scoreText = this.add.text(10, 10, 'Score: 0', { font: '16px Arial', fill: '#ffffff' });
@@ -69,40 +86,57 @@ function create() {
     cursors = this.input.keyboard.createCursorKeys();
     this.input.keyboard.addKeys({ 'A': Phaser.Input.Keyboard.KeyCodes.A, 'D': Phaser.Input.Keyboard.KeyCodes.D });
 
-    // Add collision detection
+    // Add collision detection between astronaut and asteroids (enemies)
     this.physics.add.overlap(astronaut, enemies, handleCollision, null, this);
+
+    // Add collision detection between astronaut and tokens
+    this.physics.add.overlap(astronaut, tokens, collectToken, null, this);
 
     // Create the Start Game button at the top of the screen
     startButton = this.add.text(this.scale.width / 2, 50, 'Start Game', { font: '32px Arial', fill: '#00ff00' });
     startButton.setOrigin(0.5);
     startButton.setInteractive().on('pointerdown', startGame, this);
+
+    // Enable swipe/drag interaction for mobile
+    const hammer = new Hammer(document.body);
+    hammer.get('pan').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+    hammer.on('panmove', moveAstronaut);
 }
 
 // Start the game
 function startGame() {
     startButton.destroy();  // Remove the Start Game button
     gameStarted = true;
-
-    // Start generating enemies
-    this.time.addEvent({
-        delay: 1500,
-        callback: spawnEnemy,
-        callbackScope: this,
-        loop: true
-    });
 }
 
-// Spawn an enemy at a random position at the top
-function spawnEnemy() {
+// Spawn an asteroid (enemy)
+function spawnAsteroid() {
     if (!gameOver && gameStarted) {
-        let enemyX = Phaser.Math.Between(50, config.scale.width - 50);
-        let enemy = enemies.create(enemyX, 0, 'enemy');
-        enemy.setVelocityY(100 + score * 5);  // Increase speed as score increases
-        enemy.setScale(0.2);  // Adjust enemy size
+        let asteroidX = Phaser.Math.Between(50, config.scale.width - 50);
+        let asteroid = enemies.create(asteroidX, 0, 'asteroid');
+        asteroid.setVelocityY(100);  // Adjust speed for asteroids
+        asteroid.setScale(0.2);  // Adjust size
     }
 }
 
-// Handle collisions between the astronaut and enemies
+// Spawn a token (brand product)
+function spawnToken() {
+    if (!gameOver && gameStarted) {
+        let tokenX = Phaser.Math.Between(50, config.scale.width - 50);
+        let token = tokens.create(tokenX, 0, 'token');
+        token.setVelocityY(80);  // Token moves slower than asteroids
+        token.setScale(0.15);  // Adjust token size
+    }
+}
+
+// Collect token and increase score
+function collectToken(astronaut, token) {
+    token.destroy();  // Remove the token from the screen
+    score += 1;  // Increase score by 1
+    scoreText.setText('Score: ' + score);  // Update score text
+}
+
+// Handle collisions between the astronaut and asteroids
 function handleCollision() {
     gameOver = true;
     this.physics.pause();  // Stop the game physics
@@ -110,11 +144,11 @@ function handleCollision() {
     showGameOverScreen(this);  // Show the game-over screen
 }
 
-// Display the game-over screen with a reset button
+// Show the Game Over screen and Reset button
 function showGameOverScreen(scene) {
     const gameOverText = scene.add.text(scene.scale.width / 2, scene.scale.height / 2, 'Game Over', { font: '32px Arial', fill: '#ff0000' });
     gameOverText.setOrigin(0.5);
-    
+
     const resetButton = scene.add.text(scene.scale.width / 2, scene.scale.height / 2 + 50, 'Reset', { font: '24px Arial', fill: '#ffffff' });
     resetButton.setOrigin(0.5);
     resetButton.setInteractive().on('pointerdown', () => resetGame(scene));
@@ -127,23 +161,27 @@ function resetGame(scene) {
     scoreText.setText('Score: 0');
     astronaut.clearTint();  // Remove the red tint
     enemies.clear(true, true);  // Clear all existing enemies
+    tokens.clear(true, true);  // Clear all existing tokens
     scene.scene.restart();  // Restart the scene
+}
+
+// Mobile interaction: drag to move astronaut left or right
+function moveAstronaut(event) {
+    if (gameStarted && !gameOver) {
+        astronaut.x = Phaser.Math.Clamp(event.center.x, 50, config.scale.width - 50);
+    }
 }
 
 // Game update loop
 function update() {
     if (gameStarted && !gameOver) {
-        // Apply left and right movement
+        // Desktop movement controls
         if (cursors.left.isDown || this.input.keyboard.keys[65].isDown) {
             astronaut.setVelocityX(-200);  // Move left
         } else if (cursors.right.isDown || this.input.keyboard.keys[68].isDown) {
             astronaut.setVelocityX(200);  // Move right
         } else {
-            astronaut.setVelocityX(0);  // Stop moving horizontally when no keys are pressed
+            astronaut.setVelocityX(0);  // Stop moving when no keys are pressed
         }
-
-        // Update score as long as the game is running
-        score += 1;
-        scoreText.setText('Score: ' + score);
     }
 }
