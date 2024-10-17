@@ -48,31 +48,39 @@ function preload() {
 // Create game objects and input handlers
 function create() {
     // Add background image
-    const background = this.add.image(0, 0, 'background').setOrigin(0, 0);
-    background.displayWidth = this.scale.width;
-    background.displayHeight = this.scale.height;
+    const background = this.add.image(0, 0, 'background').setOrigin(0.5, 0.5);  // Center the background
+    
+    // Set background display size based on screen dimensions
+    if (this.scale.width < 600) {  // For mobile screens
+        background.setDisplaySize(this.scale.width, window.innerHeight);  // Set height to 100% of viewport, adjust width to keep aspect ratio
+    } else {  // For desktop screens
+        background.displayWidth = this.scale.width;
+        background.displayHeight = this.scale.height;
+    }
+    background.setPosition(this.scale.width / 2, this.scale.height / 2);  // Center the background
 
-    // Set scale factors for mobile and desktop
+    // Rest of the game setup remains the same...
+    
     let astronautScaleFactor = this.scale.width < 600 ? 0.16 : 0.25;
-    let asteroidScaleFactor = this.scale.width < 600 ? 0.06 : 0.08;  // Updated asteroid scale
-    let productScaleFactor = this.scale.width < 600 ? 0.06 : 0.08;   // Updated brand product scale
+    let asteroidScaleFactor = this.scale.width < 600 ? 0.06 : 0.08;
+    let productScaleFactor = this.scale.width < 600 ? 0.06 : 0.08;
 
     // Add astronaut with physics
     astronaut = this.physics.add.sprite(this.scale.width / 2, this.scale.height - 100, 'astronaut').setInteractive();
     astronaut.setScale(astronautScaleFactor);
-    astronaut.setBounce(0.4);  // Bounce for vertical floating effect
-    astronaut.setCollideWorldBounds(true);  // Prevent astronaut from leaving bounds
-    astronaut.setDragX(500);  // Smooth drag for left-right movement
-    astronaut.body.allowGravity = true;  // Floating effect
+    astronaut.setBounce(0.4);
+    astronaut.setCollideWorldBounds(true);
+    astronaut.setDragX(500);
+    astronaut.body.allowGravity = true;
 
-    // Apply continuous floating using a tween
+    // Apply continuous floating effect using tween
     this.tweens.add({
         targets: astronaut,
-        y: astronaut.y - 15,  // Move the astronaut up by 15 pixels
-        duration: 1500,  // Duration for the movement
-        yoyo: true,  // Reverse the movement to create a floating effect
-        repeat: -1,  // Repeat infinitely
-        ease: 'Sine.easeInOut'  // Smooth easing for realistic floating
+        y: astronaut.y - 15,
+        duration: 1500,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
     });
 
     // Create enemies group (asteroids)
