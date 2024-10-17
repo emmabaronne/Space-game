@@ -28,12 +28,11 @@ function preload() {
     this.load.image('background', 'assets/background.png');  // Preload the background image
 }
 
-// Create game objects and input handlers
 function create() {
-    // Add static background image to the game
-    this.add.image(0, 0, 'background').setOrigin(0, 0).setDisplaySize(config.width, config.height);
-
-    // Add astronaut sprite at the bottom of the screen
+    // Add static background image to the game, making sure it covers the entire screen
+    const background = this.add.image(0, 0, 'background').setOrigin(0, 0).setDisplaySize(this.scale.width, this.scale.height);
+    
+    // Add astronaut sprite on top of the background
     astronaut = this.add.sprite(this.scale.width / 2, this.scale.height - 100, 'astronaut').setInteractive();
 
     // Add event listeners for pointer (touch/mouse) interactions
@@ -56,6 +55,7 @@ function create() {
     cursors = this.input.keyboard.createCursorKeys();  // Arrow keys
     this.input.keyboard.addKeys({ 'A': Phaser.Input.Keyboard.KeyCodes.A, 'D': Phaser.Input.Keyboard.KeyCodes.D });
 }
+
 
 // Track when the user is pressing down (touch/mouse)
 function startDragging(pointer) {
