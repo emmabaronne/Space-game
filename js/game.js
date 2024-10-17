@@ -17,6 +17,13 @@ const config = {
     },
     backgroundColor: '#000000',
     parent: 'game-container',
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 50 },  // Apply low gravity for floating effect
+            debug: false  // Set true if you want to see the physics bounds for debugging
+        }
+    },
     scene: {
         preload: preload,
         create: create,
@@ -44,10 +51,13 @@ function create() {
     // Set scale factors for mobile and desktop
     let astronautScaleFactor = this.scale.width < 600 ? 0.16 : 0.25;
 
-    // Add astronaut
-    astronaut = this.add.sprite(this.scale.width / 2, this.scale.height - 100, 'astronaut').setInteractive();
+    // Add astronaut with physics and allow it to bounce
+    astronaut = this.physics.add.sprite(this.scale.width / 2, this.scale.height - 100, 'astronaut').setInteractive();
     astronaut.setScale(astronautScaleFactor);
-    this.physics.add.existing(astronaut);  // Add physics to the astronaut
+    astronaut.setBounce(0.3);  // Slight bounce effect
+    astronaut.setCollideWorldBounds(true);  // Keeps astronaut within bounds
+    astronaut.setDragX(600);  // Horizontal drag to make movement smoother
+    astronaut.body.allowGravity = true;  // Gravity will affect only the vertical axis
 
     // Create enemies group
     enemies = this.physics.add.group();
@@ -123,11 +133,13 @@ function resetGame(scene) {
 // Game update loop
 function update() {
     if (gameStarted && !gameOver) {
-        // Move astronaut left and right
+        // Apply left and right movement
         if (cursors.left.isDown || this.input.keyboard.keys[65].isDown) {
-            astronaut.x = Phaser.Math.Clamp(astronaut.x - 5, 50, config.scale.width - 50);
+            astronaut.setVelocityX(-200);  // Move left
         } else if (cursors.right.isDown || this.input.keyboard.keys[68].isDown) {
-            astronaut.x = Phaser.Math.Clamp(astronaut.x + 5, 50, config.scale.width - 50);
+            astronaut.setVelocityX(200);  // Move right
+        } else {
+            astronaut.setVelocityX(0);  // Stop moving horizontally when no keys are pressed
         }
 
         // Update score as long as the game is running
