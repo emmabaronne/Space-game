@@ -38,11 +38,11 @@ function create() {
     // Set different scale factors for mobile and desktop
     let astronautScaleFactor;
     if (this.scale.width < 600) {
-        // Mobile screen (width less than 600px) - 2x smaller
-        astronautScaleFactor = 0.5;  // Scale down to 2x smaller
+        // Mobile screen (width less than 600px) - Reduce size further by 2x
+        astronautScaleFactor = 0.25;  // 2x smaller than the previous mobile size
     } else {
-        // Desktop screen (width 600px or more) - 4x smaller
-        astronautScaleFactor = 0.25;  // Scale down to 4x smaller
+        // Desktop screen (width 600px or more) - Keep the current desktop size
+        astronautScaleFactor = 0.25;  // Already 4x smaller for desktop
     }
 
     // Add astronaut sprite at the bottom of the screen and scale it accordingly
