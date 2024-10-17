@@ -4,6 +4,8 @@ let enemies;
 let score = 0;
 let gameOver = false;
 let scoreText;
+let gameStarted = false;
+let startButton;
 
 const config = {
     type: Phaser.AUTO,
@@ -45,17 +47,10 @@ function create() {
     // Add astronaut
     astronaut = this.add.sprite(this.scale.width / 2, this.scale.height - 100, 'astronaut').setInteractive();
     astronaut.setScale(astronautScaleFactor);
+    this.physics.add.existing(astronaut);  // Add physics to the astronaut
 
     // Create enemies group
     enemies = this.physics.add.group();
-
-    // Generate enemies every 1.5 seconds (frequency can increase with score)
-    this.time.addEvent({
-        delay: 1500,
-        callback: spawnEnemy,
-        callbackScope: this,
-        loop: true
-    });
 
     // Initialize score text
     scoreText = this.add.text(10, 10, 'Score: 0', { font: '16px Arial', fill: '#ffffff' });
@@ -66,11 +61,30 @@ function create() {
 
     // Add collision detection
     this.physics.add.overlap(astronaut, enemies, handleCollision, null, this);
+
+    // Create the Start Game button
+    startButton = this.add.text(this.scale.width / 2, this.scale.height / 2, 'Start Game', { font: '32px Arial', fill: '#00ff00' });
+    startButton.setOrigin(0.5);
+    startButton.setInteractive().on('pointerdown', startGame, this);
+}
+
+// Start the game
+function startGame() {
+    startButton.destroy();  // Remove the Start Game button
+    gameStarted = true;
+
+    // Start generating enemies
+    this.time.addEvent({
+        delay: 1500,
+        callback: spawnEnemy,
+        callbackScope: this,
+        loop: true
+    });
 }
 
 // Spawn an enemy at a random position at the top
 function spawnEnemy() {
-    if (!gameOver) {
+    if (!gameOver && gameStarted) {
         let enemyX = Phaser.Math.Between(50, config.scale.width - 50);
         let enemy = enemies.create(enemyX, 0, 'enemy');
         enemy.setVelocityY(100 + score * 5);  // Increase speed as score increases
@@ -99,7 +113,6 @@ function showGameOverScreen(scene) {
 // Reset the game
 function resetGame(scene) {
     gameOver = false;
-    scene.physics.resume();  // Resume the game physics
     score = 0;
     scoreText.setText('Score: 0');
     astronaut.clearTint();  // Remove the red tint
@@ -109,23 +122,16 @@ function resetGame(scene) {
 
 // Game update loop
 function update() {
-    // Move astronaut left and right
-    if (cursors.left.isDown || this.input.keyboard.keys[65].isDown) {
-        astronaut.x = Phaser.Math.Clamp(astronaut.x - 5, 50, config.scale.width - 50);
-    } else if (cursors.right.isDown || this.input.keyboard.keys[68].isDown) {
-        astronaut.x = Phaser.Math.Clamp(astronaut.x + 5, 50, config.scale.width - 50);
-    }
+    if (gameStarted && !gameOver) {
+        // Move astronaut left and right
+        if (cursors.left.isDown || this.input.keyboard.keys[65].isDown) {
+            astronaut.x = Phaser.Math.Clamp(astronaut.x - 5, 50, config.scale.width - 50);
+        } else if (cursors.right.isDown || this.input.keyboard.keys[68].isDown) {
+            astronaut.x = Phaser.Math.Clamp(astronaut.x + 5, 50, config.scale.width - 50);
+        }
 
-    // Update score as long as the game is running
-    if (!gameOver) {
+        // Update score as long as the game is running
         score += 1;
         scoreText.setText('Score: ' + score);
-    }
-
-    // Increase difficulty over time (reduce delay or increase speed)
-    if (score % 500 === 0) {
-        enemies.children.iterate(function (enemy) {
-            enemy.setVelocityY(enemy.body.velocity.y + 10);  // Increase enemy speed
-        });
     }
 }
