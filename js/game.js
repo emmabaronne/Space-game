@@ -62,8 +62,8 @@ function create() {
     // Add collision detection
     this.physics.add.overlap(astronaut, enemies, handleCollision, null, this);
 
-    // Create the Start Game button
-    startButton = this.add.text(this.scale.width / 2, this.scale.height / 2, 'Start Game', { font: '32px Arial', fill: '#00ff00' });
+    // Create the Start Game button at the top of the screen
+    startButton = this.add.text(this.scale.width / 2, 50, 'Start Game', { font: '32px Arial', fill: '#00ff00' });
     startButton.setOrigin(0.5);
     startButton.setInteractive().on('pointerdown', startGame, this);
 }
