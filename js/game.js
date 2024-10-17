@@ -60,11 +60,21 @@ function create() {
     // Add astronaut with physics
     astronaut = this.physics.add.sprite(this.scale.width / 2, this.scale.height - 100, 'astronaut').setInteractive();
     astronaut.setScale(astronautScaleFactor);
-    astronaut.setBounce(0.4);  // Increase bounce for more visible floating
+    astronaut.setBounce(0.4);  // Bounce for vertical floating effect
     astronaut.setCollideWorldBounds(true);  // Prevent astronaut from leaving bounds
     astronaut.setDragX(500);  // Smooth drag for left-right movement
     astronaut.body.allowGravity = true;  // Floating effect
-    
+
+    // Apply continuous floating using a tween
+    this.tweens.add({
+        targets: astronaut,
+        y: astronaut.y - 15,  // Move the astronaut up by 15 pixels
+        duration: 1500,  // Duration for the movement
+        yoyo: true,  // Reverse the movement to create a floating effect
+        repeat: -1,  // Repeat infinitely
+        ease: 'Sine.easeInOut'  // Smooth easing for realistic floating
+    });
+
     // Create enemies group (asteroids)
     enemies = this.physics.add.group();
     this.time.addEvent({
