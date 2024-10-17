@@ -35,10 +35,19 @@ function create() {
     background.displayWidth = this.scale.width;  // Fit background to the screen width
     background.displayHeight = this.scale.height;  // Fit background to the screen height
 
-    // Set a dynamic scale for the astronaut based on screen width to fit mobile screens
-    const astronautScaleFactor = this.scale.width / 800;  // Adjust 800 to fit your design
+    // Set different scale factors for mobile and desktop
+    let astronautScaleFactor;
+    if (this.scale.width < 600) {
+        // Mobile screen (width less than 600px)
+        astronautScaleFactor = (this.scale.width / 1200) * 0.01;  // 10x smaller for mobile
+    } else {
+        // Desktop screen (width 600px or more)
+        astronautScaleFactor = this.scale.width / 1800;  // Keep the current scale for desktop
+    }
+
+    // Add astronaut sprite at the bottom of the screen and scale it accordingly
     astronaut = this.add.sprite(this.scale.width / 2, this.scale.height - 100, 'astronaut').setInteractive();
-    astronaut.setScale(astronautScaleFactor);  // Scale dynamically based on screen size
+    astronaut.setScale(astronautScaleFactor);  // Apply the dynamic scale based on screen size
 
     // Add event listeners for pointer (touch/mouse) interactions
     this.input.on('pointerdown', startDragging);
