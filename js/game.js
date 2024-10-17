@@ -45,12 +45,15 @@ function preload() {
     this.load.image('token', 'assets/brand-product.png');  // Preload token (brand product)
 }
 
-// Create game objects and input handlers
 function create() {
     // Add background image and ensure it's placed at the back
     const background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'background');
-    background.setDisplaySize(this.scale.width, this.scale.height);  // Scale background to fit the screen
-    background.setDepth(-1);  // Set depth to ensure it's behind other objects
+    
+    // Scale the background to cover the screen, overflowing horizontally while maintaining the aspect ratio
+    const scaleRatio = Math.max(this.scale.width / background.width, this.scale.height / background.height);
+    background.setScale(scaleRatio).setScrollFactor(0);
+    background.setPosition(this.scale.width / 2, this.scale.height / 2);  // Center the background
+    background.setDepth(-1);  // Ensure the background is behind other objects
 
     let astronautScaleFactor = this.scale.width < 600 ? 0.16 : 0.25;
     let asteroidScaleFactor = this.scale.width < 600 ? 0.06 : 0.08;
