@@ -52,6 +52,8 @@ function create() {
 
     // Set scale factors for mobile and desktop
     let astronautScaleFactor = this.scale.width < 600 ? 0.16 : 0.25;
+    let asteroidScaleFactor = this.scale.width < 600 ? 0.70 : 0.60;  // Set asteroid scale
+    let productScaleFactor = this.scale.width < 600 ? 0.70 : 0.60;   // Set brand product scale
 
     // Add astronaut with physics
     astronaut = this.physics.add.sprite(this.scale.width / 2, this.scale.height - 100, 'astronaut').setInteractive();
@@ -65,7 +67,7 @@ function create() {
     enemies = this.physics.add.group();
     this.time.addEvent({
         delay: 1500,
-        callback: spawnAsteroid,
+        callback: function() { spawnAsteroid(asteroidScaleFactor); },  // Pass scale factor
         callbackScope: this,
         loop: true
     });
@@ -74,7 +76,7 @@ function create() {
     tokens = this.physics.add.group();
     this.time.addEvent({
         delay: 2000,
-        callback: spawnToken,
+        callback: function() { spawnToken(productScaleFactor); },  // Pass scale factor
         callbackScope: this,
         loop: true
     });
@@ -110,22 +112,22 @@ function startGame() {
 }
 
 // Spawn an asteroid (enemy)
-function spawnAsteroid() {
+function spawnAsteroid(scaleFactor) {
     if (!gameOver && gameStarted) {
         let asteroidX = Phaser.Math.Between(50, config.scale.width - 50);
         let asteroid = enemies.create(asteroidX, 0, 'asteroid');
         asteroid.setVelocityY(100);  // Adjust speed for asteroids
-        asteroid.setScale(0.2);  // Adjust size
+        asteroid.setScale(scaleFactor);  // Apply scale factor (0.60 for desktop, 0.70 for mobile)
     }
 }
 
 // Spawn a token (brand product)
-function spawnToken() {
+function spawnToken(scaleFactor) {
     if (!gameOver && gameStarted) {
         let tokenX = Phaser.Math.Between(50, config.scale.width - 50);
         let token = tokens.create(tokenX, 0, 'token');
         token.setVelocityY(80);  // Token moves slower than asteroids
-        token.setScale(0.15);  // Adjust token size
+        token.setScale(scaleFactor);  // Apply scale factor (0.60 for desktop, 0.70 for mobile)
     }
 }
 
