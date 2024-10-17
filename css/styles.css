@@ -1,0 +1,30 @@
+/* Ensure the game takes up the full height of the screen */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100vh; /* Full viewport height */
+    overflow: hidden;
+}
+
+/* Ensure the game container takes up the full screen */
+#game-container {
+    width: 100vw;  /* Full viewport width */
+    height: 100vh;  /* Full viewport height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    background-color: black;  /* Fallback color in case the image doesn't load */
+}
+
+/* Add this to make sure the background image is responsive and centered */
+.background-image {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    height: 100vh;  /* Full height of the viewport */
+    object-fit: cover;  /* Maintain aspect ratio, cover full height */
+}

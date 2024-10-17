@@ -49,18 +49,11 @@ function preload() {
 function create() {
     // Add background image
     const background = this.add.image(0, 0, 'background').setOrigin(0.5, 0.5);  // Center the background
-    
-    // Set background display size based on screen dimensions
-    if (this.scale.width < 600) {  // For mobile screens
-        background.setDisplaySize(this.scale.width, window.innerHeight);  // Set height to 100% of viewport, adjust width to keep aspect ratio
-    } else {  // For desktop screens
-        background.displayWidth = this.scale.width;
-        background.displayHeight = this.scale.height;
-    }
-    background.setPosition(this.scale.width / 2, this.scale.height / 2);  // Center the background
+    background.setDisplaySize(this.scale.width, window.innerHeight);  // Set height to 100% VH, width adjusts to maintain aspect ratio
+    background.setPosition(this.scale.width / 2, this.scale.height / 2);  // Ensure it remains centered
 
     // Rest of the game setup remains the same...
-    
+
     let astronautScaleFactor = this.scale.width < 600 ? 0.16 : 0.25;
     let asteroidScaleFactor = this.scale.width < 600 ? 0.06 : 0.08;
     let productScaleFactor = this.scale.width < 600 ? 0.06 : 0.08;
@@ -82,6 +75,7 @@ function create() {
         repeat: -1,
         ease: 'Sine.easeInOut'
     });
+
 
     // Create enemies group (asteroids)
     enemies = this.physics.add.group();
