@@ -1,15 +1,18 @@
-/* Ensure the body and html take the full height of the screen and respect the safe area insets */
+/* Ensure the body and html take the full height of the screen and respect mobile device insets */
 body, html {
     margin: 0;
     padding: 0;
     height: 100vh;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     
-    /* Padding for iPhone notch and safe areas */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
+    /* Handle safe areas for modern devices like iPhones */
+    padding-top: env(safe-area-inset-top, 0);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    padding-left: env(safe-area-inset-left, 0);
+    padding-right: env(safe-area-inset-right, 0);
 }
 
 /* Ensure the game container takes up the full screen */
