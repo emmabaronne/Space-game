@@ -1,16 +1,19 @@
 let astronaut;
-let isDragging = false;  // To track if the user is holding the screen
-let cursors;  // To handle keyboard inputs
+let cursors;
+let enemies;
+let score = 0;
+let gameOver = false;
+let scoreText;
 
 const config = {
     type: Phaser.AUTO,
     scale: {
-        mode: Phaser.Scale.FIT,  // Scales the game to fit the screen
-        autoCenter: Phaser.Scale.CENTER_BOTH,  // Centers the game on the screen
-        width: window.innerWidth,  // Uses the full screen width
-        height: window.innerHeight  // Uses the full screen height
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: window.innerWidth,
+        height: window.innerHeight
     },
-    backgroundColor: '#000000',  // Background color (black for space)
+    backgroundColor: '#000000',
     parent: 'game-container',
     scene: {
         preload: preload,
@@ -24,79 +27,105 @@ const game = new Phaser.Game(config);
 
 // Preload assets
 function preload() {
-    this.load.image('astronaut', 'assets/astronaut.png');  // Preload the astronaut image
-    this.load.image('background', 'assets/background.png');  // Preload the background image
+    this.load.image('astronaut', 'assets/astronaut.png');
+    this.load.image('background', 'assets/background.png');
+    this.load.image('enemy', 'assets/enemy.png');  // Preload enemy image
 }
 
 // Create game objects and input handlers
 function create() {
-    // Add background image and ensure it covers the entire screen responsively
+    // Add background image
     const background = this.add.image(0, 0, 'background').setOrigin(0, 0);
-    background.displayWidth = this.scale.width;  // Fit background to the screen width
-    background.displayHeight = this.scale.height;  // Fit background to the screen height
+    background.displayWidth = this.scale.width;
+    background.displayHeight = this.scale.height;
 
-    // Set different scale factors for mobile and desktop
-    let astronautScaleFactor;
-    if (this.scale.width < 600) {
-        // Mobile screen (width less than 600px) - Use 0.16 scaling factor for mobile
-        astronautScaleFactor = 0.16;
-    } else {
-        // Desktop screen (width 600px or more) - Use 0.25 scaling factor for desktop
-        astronautScaleFactor = 0.25;
-    }
+    // Set scale factors for mobile and desktop
+    let astronautScaleFactor = this.scale.width < 600 ? 0.16 : 0.25;
 
-    // Add astronaut sprite at the bottom of the screen and scale it accordingly
+    // Add astronaut
     astronaut = this.add.sprite(this.scale.width / 2, this.scale.height - 100, 'astronaut').setInteractive();
-    astronaut.setScale(astronautScaleFactor);  // Apply the dynamic scale based on screen size
+    astronaut.setScale(astronautScaleFactor);
 
-    // Add event listeners for pointer (touch/mouse) interactions
-    this.input.on('pointerdown', startDragging);
-    this.input.on('pointermove', moveAstronaut);
-    this.input.on('pointerup', stopDragging);
+    // Create enemies group
+    enemies = this.physics.add.group();
 
-    // Full-screen button
-    const fullscreenButton = this.add.text(10, 10, 'Full Screen', { font: '16px Arial', fill: '#ffffff' })
-        .setInteractive()
-        .on('pointerdown', () => {
-            if (this.scale.isFullscreen) {
-                this.scale.stopFullscreen();
-            } else {
-                this.scale.startFullscreen();
-            }
-        });
+    // Generate enemies every 1.5 seconds (frequency can increase with score)
+    this.time.addEvent({
+        delay: 1500,
+        callback: spawnEnemy,
+        callbackScope: this,
+        loop: true
+    });
 
-    // Initialize keyboard input for arrow keys and "A" and "D" keys
-    cursors = this.input.keyboard.createCursorKeys();  // Arrow keys
+    // Initialize score text
+    scoreText = this.add.text(10, 10, 'Score: 0', { font: '16px Arial', fill: '#ffffff' });
+
+    // Initialize keyboard input
+    cursors = this.input.keyboard.createCursorKeys();
     this.input.keyboard.addKeys({ 'A': Phaser.Input.Keyboard.KeyCodes.A, 'D': Phaser.Input.Keyboard.KeyCodes.D });
+
+    // Add collision detection
+    this.physics.add.overlap(astronaut, enemies, handleCollision, null, this);
 }
 
-// Track when the user is pressing down (touch/mouse)
-function startDragging(pointer) {
-    isDragging = true;
-}
-
-// Move the astronaut as the user drags their finger (touch/mouse)
-function moveAstronaut(pointer) {
-    if (isDragging) {
-        // Move the astronaut based on the pointer's X position
-        astronaut.x = Phaser.Math.Clamp(pointer.x, 50, config.scale.width - 50);  // Clamp to keep astronaut on the screen
+// Spawn an enemy at a random position at the top
+function spawnEnemy() {
+    if (!gameOver) {
+        let enemyX = Phaser.Math.Between(50, config.scale.width - 50);
+        let enemy = enemies.create(enemyX, 0, 'enemy');
+        enemy.setVelocityY(100 + score * 5);  // Increase speed as score increases
+        enemy.setScale(0.2);  // Adjust enemy size
     }
 }
 
-// Stop dragging when the user lifts their finger (touch/mouse)
-function stopDragging() {
-    isDragging = false;
+// Handle collisions between the astronaut and enemies
+function handleCollision() {
+    gameOver = true;
+    this.physics.pause();  // Stop the game physics
+    astronaut.setTint(0xff0000);  // Turn astronaut red to indicate hit
+    showGameOverScreen(this);  // Show the game-over screen
 }
 
-// Update loop: handles keyboard inputs for desktop
-function update() {
-    // Move left with left arrow or "A"
-    if (cursors.left.isDown || this.input.keyboard.keys[65].isDown) {  // 65 is the keycode for "A"
-        astronaut.x = Phaser.Math.Clamp(astronaut.x - 5, 50, config.scale.width - 50);  // Move left, clamped to screen bounds
-    }
+// Display the game-over screen with a reset button
+function showGameOverScreen(scene) {
+    const gameOverText = scene.add.text(scene.scale.width / 2, scene.scale.height / 2, 'Game Over', { font: '32px Arial', fill: '#ff0000' });
+    gameOverText.setOrigin(0.5);
     
-    // Move right with right arrow or "D"
-    if (cursors.right.isDown || this.input.keyboard.keys[68].isDown) {  // 68 is the keycode for "D"
-        astronaut.x = Phaser.Math.Clamp(astronaut.x + 5, 50, config.scale.width - 50);  // Move right, clamped to screen bounds
+    const resetButton = scene.add.text(scene.scale.width / 2, scene.scale.height / 2 + 50, 'Reset', { font: '24px Arial', fill: '#ffffff' });
+    resetButton.setOrigin(0.5);
+    resetButton.setInteractive().on('pointerdown', () => resetGame(scene));
+}
+
+// Reset the game
+function resetGame(scene) {
+    gameOver = false;
+    scene.physics.resume();  // Resume the game physics
+    score = 0;
+    scoreText.setText('Score: 0');
+    astronaut.clearTint();  // Remove the red tint
+    enemies.clear(true, true);  // Clear all existing enemies
+    scene.scene.restart();  // Restart the scene
+}
+
+// Game update loop
+function update() {
+    // Move astronaut left and right
+    if (cursors.left.isDown || this.input.keyboard.keys[65].isDown) {
+        astronaut.x = Phaser.Math.Clamp(astronaut.x - 5, 50, config.scale.width - 50);
+    } else if (cursors.right.isDown || this.input.keyboard.keys[68].isDown) {
+        astronaut.x = Phaser.Math.Clamp(astronaut.x + 5, 50, config.scale.width - 50);
+    }
+
+    // Update score as long as the game is running
+    if (!gameOver) {
+        score += 1;
+        scoreText.setText('Score: ' + score);
+    }
+
+    // Increase difficulty over time (reduce delay or increase speed)
+    if (score % 500 === 0) {
+        enemies.children.iterate(function (enemy) {
+            enemy.setVelocityY(enemy.body.velocity.y + 10);  // Increase enemy speed
+        });
     }
 }
