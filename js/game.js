@@ -40,14 +40,17 @@ const game = new Phaser.Game(config);
 // Preload assets
 function preload() {
     this.load.image('astronaut', 'assets/astronaut.png');
-    this.load.image('background', 'assets/background.png');
+    this.load.image('background', 'assets/background.png');  // Preload background image here
     this.load.image('asteroid', 'assets/asteroid.png');  // Preload asteroid (enemy)
     this.load.image('token', 'assets/brand-product.png');  // Preload token (brand product)
 }
 
 // Create game objects and input handlers
 function create() {
-    // Background is now handled through CSS, so no background setup here in JS.
+    // Add background image and ensure it's placed at the back
+    const background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'background');
+    background.setDisplaySize(this.scale.width, this.scale.height);  // Scale background to fit the screen
+    background.setDepth(-1);  // Set depth to ensure it's behind other objects
 
     let astronautScaleFactor = this.scale.width < 600 ? 0.16 : 0.25;
     let asteroidScaleFactor = this.scale.width < 600 ? 0.06 : 0.08;
