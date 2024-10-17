@@ -1,9 +1,15 @@
-/* Ensure the body and html take the full height of the screen */
+/* Ensure the body and html take the full height of the screen and respect the safe area insets */
 body, html {
     margin: 0;
     padding: 0;
     height: 100vh;
     overflow: hidden;
+    
+    /* Padding for iPhone notch and safe areas */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
 }
 
 /* Ensure the game container takes up the full screen */
@@ -16,8 +22,8 @@ body, html {
     justify-content: center;
     align-items: center;
     background-color: black;  /* Fallback color in case the image doesn't load */
-    background-image: url('assets/background.png');  /* Ensure this points to the correct location */
+    background-image: url('assets/background.png');
     background-position: center;
     background-repeat: no-repeat;
-    background-size: cover;  /* Ensures the image covers the screen and maintains its aspect ratio */
+    background-size: cover;
 }
